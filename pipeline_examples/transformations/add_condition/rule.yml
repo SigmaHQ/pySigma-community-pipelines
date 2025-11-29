@@ -7,7 +7,6 @@ date: 2025-01-01
 logsource:
     category: process_creation
     product: windows
-    service: sysmon
 detection:
     selection:
         Image|endswith: '\malware.exe'

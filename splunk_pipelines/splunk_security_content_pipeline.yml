@@ -1,0 +1,169 @@
+# Splunk Security Content - Detection Format Pipeline
+# Converts Sigma rules to Splunk detection format compatible with the Splunk Security Content repository.
+#
+# Usage: sigma convert -p splunk_cim -p splunk_security_content_pipeline.yml -t splunk -f data_model rule.yml
+# Note: This is a proof of concept and will require further refinement for production use.
+
+name: splunk_detection_format
+priority: 100
+
+vars:
+  # Data source mappings based on logsource
+  data_source_mappings:
+    process_creation_windows:
+      - "Sysmon EventID 1"
+      - "Windows Event Log Security 4688"
+      - "CrowdStrike ProcessRollup2"
+    network_connection_windows:
+      - "Sysmon EventID 3"
+    file_event_windows:
+      - "Sysmon EventID 11"
+      - "Windows Event Log Security 4663"
+    registry_event_windows:
+      - "Sysmon EventID 12"
+      - "Sysmon EventID 13"
+      - "Sysmon EventID 14"
+    
+  # How to implement text based on logsource
+  how_to_implement_mappings:
+    process_creation_windows: |
+      The detection is based on data that originates from Endpoint Detection
+      and Response (EDR) agents. These agents are designed to provide security-related
+      telemetry from the endpoints where the agent is installed. To implement this search,
+      you must ingest logs that contain the process GUID, process name, and parent process.
+      Additionally, you must ingest complete command-line executions. These logs must
+      be processed using the appropriate Splunk Technology Add-ons that are specific to
+      the EDR product. The logs must also be mapped to the `Processes` node of the `Endpoint`
+      data model. Use the Splunk Common Information Model (CIM) to normalize the field
+      names and speed up the data modeling process.
+    network_connection_windows: |
+      The detection is based on data that originates from network monitoring agents
+      or endpoint telemetry that captures network connections. To implement this search,
+      you must ingest logs that contain network connection information including source
+      and destination IP addresses, ports, and processes. These logs must be processed
+      using the appropriate Splunk Technology Add-ons and mapped to the `All_Traffic`
+      node of the `Network_Traffic` data model. Use the Splunk Common Information Model (CIM)
+      to normalize the field names and speed up the data modeling process.
+    file_event_windows: |
+      The detection is based on data that originates from Endpoint Detection and Response
+      (EDR) agents monitoring file system activity. To implement this search, you must
+      ingest logs that contain file creation, modification, and deletion events. These
+      logs must be processed using the appropriate Splunk Technology Add-ons that are
+      specific to the EDR product. The logs must also be mapped to the `Filesystem` node
+      of the `Endpoint` data model. Use the Splunk Common Information Model (CIM) to
+      normalize the field names and speed up the data modeling process.
+    registry_event_windows: |
+      The detection is based on data that originates from Endpoint Detection and Response
+      (EDR) agents monitoring Windows registry activity. To implement this search, you must
+      ingest logs that contain registry key and value modifications. These logs must be
+      processed using the appropriate Splunk Technology Add-ons that are specific to the
+      EDR product. The logs must also be mapped to the `Registry` node of the `Endpoint`
+      data model. Use the Splunk Common Information Model (CIM) to normalize the field
+      names and speed up the data modeling process.
+
+transformations:
+  # Set custom attributes based on logsource for later use in template
+  - id: set_data_source_process_creation
+    type: set_custom_attribute
+    attribute: splunk_data_source_key
+    value: process_creation_windows
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows
+
+  - id: set_data_source_network_connection
+    type: set_custom_attribute
+    attribute: splunk_data_source_key
+    value: network_connection_windows
+    rule_conditions:
+      - type: logsource
+        category: network_connection
+        product: windows
+
+  - id: set_data_source_file_event
+    type: set_custom_attribute
+    attribute: splunk_data_source_key
+    value: file_event_windows
+    rule_conditions:
+      - type: logsource
+        category: file_event
+        product: windows
+
+  - id: set_data_source_registry_event
+    type: set_custom_attribute
+    attribute: splunk_data_source_key
+    value: registry_event_windows
+    rule_conditions:
+      - type: logsource
+        category: registry_event
+        product: windows
+
+# Post-processing to wrap individual queries in template
+postprocessing:
+  - type: template
+    template: |
+      {%- set detection_type = "Anomaly" %}
+      {%- if rule.level %}
+        {%- if rule.level.name in ["HIGH", "CRITICAL"] %}
+          {%- set detection_type = "TTP" %}
+        {%- elif rule.level.name in ["LOW", "INFORMATIONAL"] %}
+          {%- set detection_type = "Hunting" %}
+        {%- endif %}
+      {%- endif %}
+      {%- set rule_date = rule.modified if rule.modified else rule.date %}
+      {%- set status_value = "experimental" %}
+      {%- if rule.status %}
+        {%- if rule.status.name.lower() in ["test", "stable"] %}
+          {%- set status_value = "production" %}
+        {%- else %}
+          {%- set status_value = rule.status.name.lower() %}
+        {%- endif %}
+      {%- endif %}
+      name: {{ rule.title }}
+      id: {{ rule.id }}
+      version: 1
+      date: '{{ rule_date.strftime("%Y-%m-%d") if rule_date else "2025-01-01" }}'
+      author: {{ rule.author if rule.author else "Unknown" }}
+      status: {{ status_value }}
+      type: {{ detection_type }}
+      description: |
+        {{ rule.description | indent(2) if rule.description else "No description provided." }}
+      {%- if rule.custom_attributes.get("splunk_data_source_key") %}
+      data_source:
+      {%- for source in pipeline.vars.data_source_mappings.get(rule.custom_attributes.get("splunk_data_source_key"), []) %}
+        - {{ source }}
+      {%- endfor %}
+      {%- endif %}
+      search: |
+        {{ query | indent(2) }}
+      {%- if rule.custom_attributes.get("splunk_data_source_key") %}
+      how_to_implement: |
+        {{ pipeline.vars.how_to_implement_mappings.get(rule.custom_attributes.get("splunk_data_source_key"), "Implementation details not available.") | indent(2) }}
+      {%- endif %}
+      {%- if rule.falsepositives and rule.falsepositives | length > 0 %}
+      known_false_positives: |
+      {%- for fp in rule.falsepositives %}
+        {{ fp }}
+      {%- endfor %}
+      {%- endif %}
+      {%- if rule.references and rule.references | length > 0 %}
+      references:
+      {%- for ref in rule.references %}
+        - {{ ref }}
+      {%- endfor %}
+      {%- endif %}
+      drilldown_searches:
+        - name: View the detection results for - "$dest$" and "$user$"
+          search: '%original_detection_search% | search  dest = "$dest$" user = "$user$"'
+          earliest_offset: $info_min_time$
+          latest_offset: $info_max_time$
+        - name: View risk events for the last 7 days for - "$dest$" and "$user$"
+          search: '| from datamodel Risk.All_Risk | search normalized_risk_object IN ("$dest$",
+            "$user$") starthoursago=168  | stats count min(_time) as firstTime max(_time)
+            as lastTime values(search_name) as "Search Name" values(risk_message) as "Risk
+            Message" values(analyticstories) as "Analytic Stories" values(annotations._all)
+            as "Annotations" values(annotations.mitre_attack.mitre_tactic) as "ATT&CK Tactics"
+            by normalized_risk_object | `security_content_ctime(firstTime)` | `security_content_ctime(lastTime)`'
+          earliest_offset: $info_min_time$
+          latest_offset: $info_max_time$

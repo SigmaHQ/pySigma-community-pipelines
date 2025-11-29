@@ -28,7 +28,6 @@ Query postprocessing transformations modify individual queries **AFTER** backend
 - **[template](./query_postprocessing_transformations/template/)** - Applies Jinja2 templates with conditional logic and loops
 - **[json](./query_postprocessing_transformations/json/)** - Embeds queries into JSON structures
 - **[replace](./query_postprocessing_transformations/replace/)** - Performs regex-based find and replace on queries
-- **[nest](./query_postprocessing_transformations/nest/)** - Sequential multi-step postprocessing (see folder for notes on limitations)
 
 ### [Finalizers](./finalizers/)
 

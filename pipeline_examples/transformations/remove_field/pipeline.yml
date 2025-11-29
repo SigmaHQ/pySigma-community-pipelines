@@ -1,0 +1,33 @@
+# Remove Field Transformation Example
+# Removes one or more fields from the Sigma rule's output field list
+#
+# Transformation: remove_field
+# Class: RemoveFieldTransformation
+#
+# Parameters:
+#   field (str or list[str]): Single field name or list of field names to remove from rule output
+#
+# Use this to exclude sensitive or unnecessary fields from query results
+# Silently ignores fields that aren't in the list
+
+name: remove_field_example
+priority: 20
+
+transformations:
+  - id: remove_single_field
+    type: remove_field
+    field: ComputerName          # Removes single field from output
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: remove_multiple_fields
+    type: remove_field
+    field:                       # Removes multiple fields from output
+      - ProcessId
+      - ThreadId
+      - UtcTime
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows

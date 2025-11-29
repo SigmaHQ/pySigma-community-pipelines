@@ -1,0 +1,18 @@
+title: Query Expression Placeholders Test
+id: 24345678-3456-1234-1234-123456789012
+status: test
+description: Test rule for query expression placeholders transformation
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_threats:
+        DestinationIp|expand: '%threat_ips%'           # Will be replaced with lookup expression
+    selection_server:           # Will be replaced with lookup expression
+        QueryName|expand: '%malicious_domains%'        # Will be replaced with lookup expression
+    condition: 1 of selection_*
+falsepositives:
+    - False positives from threat feed
+level: high

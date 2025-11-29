@@ -1,0 +1,50 @@
+# Replace String Transformation Example
+# Replaces string parts matched by regex with replacement text
+#
+# Transformation: replace_string
+# Class: ReplaceStringTransformation
+#
+# Parameters:
+#   regex (str): Regular expression pattern to match
+#   replacement (str): Replacement string (can use capture groups like \1, \2)
+#   skip_special (bool): If True, only applies to plain string parts (not wildcards/placeholders)
+#   interpret_special (bool): If True with skip_special, interprets special chars in replacement
+
+name: replace_string_example
+priority: 20
+
+transformations:
+  - id: normalize_backslashes
+    type: replace_string
+    regex: '\\'                # Matches backslashes
+    replacement: '/'           # Replaces with forward slashes
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - Image
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows
+
+  - id: extract_filename_only
+    type: replace_string
+    regex: "^\\*\\\\([^\\\\]+)$" # Matches wildcard path patterns like *\filename.exe
+    replacement: "\\1"           # Extracts just the filename using capture group
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - ParentImage
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: normalize_drive_letters
+    type: replace_string
+    regex: "^[C-Z]:"             # Matches drive letters C: through Z:
+    replacement: "\\\\Device\\\\HarddiskVolume?\\\\"  # Replaces with device path
+    skip_special: false          # Apply to entire string including special chars
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - TargetFileName

@@ -1,0 +1,18 @@
+title: Hashes Fields Test
+id: 19345678-2345-1234-1234-123456789012
+status: test
+description: Test rule for hashes fields transformation
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Hashes|contains:
+            - 'MD5=5F1CBC3D99558307BC1250D084FA968521482025'
+            - 'SHA256=E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855'
+    condition: selection
+falsepositives:
+    - None
+level: high

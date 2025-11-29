@@ -1,0 +1,38 @@
+# Template Query Postprocessing Transformation Example
+# Type: template
+#
+# Description:
+# The template transformation applies a Jinja2 template to the query. This provides
+# more powerful templating capabilities than simple_template, including conditional
+# logic, loops, filters, and complex data manipulation.
+# The following variables are available in the context:
+# 
+# * query: the postprocessed query.
+# * rule: the Sigma rule including all its attributes like rule.title.
+# * pipeline: the Sigma processing pipeline where this transformation is applied including all current state information in pipeline.state.
+# 
+# if *path* is given, *template* is considered as a relative path to a template file below the
+# specified path. If it is not provided, the template is specified as plain string. *autoescape* controls the Jinja2 HTML/XML auto-escaping.
+# 
+# if *vars* is given, it should point to a Python file containing helper functions and variables to be made available in the Jinja2 template context.
+#
+# See TemplateBase for details on the format.
+# 
+
+name: template_postprocessing_example
+priority: 20
+
+postprocessing:
+  - id: level_based_wrapping
+    type: template
+    template: |
+      {% if rule.level.name in ['HIGH', 'CRITICAL'] %}
+      search index=windows {{ query }}
+      | eval priority="urgent"
+      | eval rule_id="{{ rule.id }}"
+      | eval rule_title="{{ rule.title }}"
+      {% else %}
+      search index=windows {{ query }}
+      | eval priority="normal"
+      | eval rule_id="{{ rule.id }}"
+      {% endif %}

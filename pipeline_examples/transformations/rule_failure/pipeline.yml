@@ -1,0 +1,27 @@
+# Rule Failure Transformation Example
+# Raises an error to stop processing rules that can't be converted
+#
+# Transformation: rule_failure
+# Class: RuleFailureTransformation
+#
+# Parameters:
+#   message (str): Error message to display when rule fails (REQUIRED)
+#
+# Use this to explicitly fail rules that use unsupported features or logsources
+# Useful for data sources not available in your environment
+
+name: rule_failure_example
+priority: 20
+
+transformations:
+  - id: fail_sysmon_status
+    type: rule_failure
+    message: "GrandParentImage is not a supported field for process_creation logs"  # REQUIRED error message
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - GrandParentImage
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation

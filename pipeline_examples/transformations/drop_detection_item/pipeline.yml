@@ -1,0 +1,31 @@
+# Drop Detection Item Transformation Example
+# Removes detection items from Sigma rules
+#
+# Transformation: drop_detection_item
+# Class: DropDetectionItemTransformation
+#
+# Parameters: None (use conditions to control which items are dropped)
+#
+# Use with detection_item_conditions or field_name_conditions to selectively remove
+# specific detection items that aren't supported or needed
+
+name: drop_detection_item_example
+priority: 20
+
+transformations:
+  - id: drop_eventtype_field
+    type: drop_detection_item     # No parameters needed
+    field_name_conditions:
+      - type: include_fields      # Only drop items with these field names
+        fields:
+          - EventType
+    rule_conditions:
+      - type: logsource
+        category: registry_add
+        product: windows
+
+  - id: drop_null_values
+    type: drop_detection_item     # Drops all null/empty detection items
+    detection_item_conditions:
+      - type: is_null
+        cond: any                  # Match if any value is null

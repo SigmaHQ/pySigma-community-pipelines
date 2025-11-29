@@ -1,0 +1,41 @@
+title: Comprehensive Field Mapping Test
+id: 12345678-1234-1234-1234-123456789012
+status: test
+description: Test rule demonstrating all field name mapping conditions
+author: Test Author
+date: 2025-01-01
+tags:
+    - attack.t1055
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        EventID: 1
+        User|contains: 'SYSTEM'
+        Image: 'test222.exe'              # Exact match for contains_detection_item
+        TargetFileName: 'test.exe'              # Exact match for contains_detection_item
+        CommandLine|contains: '*cmd*'  # Contains wildcard for wildcard condition
+        ParentImage|endswith: '\explorer.exe'
+        IntegrityLevel: '*High*'        # Contains wildcard for multiple conditions example
+        ProcessId: 1234
+        Hashes|contains: 'MD5=5F1CBC3D99558307BC1250D084FA968521482025'  # For regex pattern match
+        DestinationIp|startswith: '192.168.'
+        SourceIp|endswith: '.10'
+        TargetObject|contains: 'registry'
+        Details|contains: 'DWORD (0x00000001)'
+        Optional: null
+        Computer: 'WORKSTATION01'
+    condition: selection
+fields:
+    - EventID
+    - User
+    - Image
+    - CommandLine
+    - ParentImage
+    - IntegrityLevel
+    - ProcessId
+    - Hashes
+falsepositives:
+    - Administrative activity
+level: high

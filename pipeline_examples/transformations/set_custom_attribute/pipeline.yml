@@ -1,0 +1,29 @@
+# Set Custom Attribute Transformation Example
+# Sets arbitrary custom attributes on rules for backend processing
+#
+# Transformation: set_custom_attribute
+# Class: SetCustomAttributeTransformation
+#
+# Parameters:
+#   attribute (str): Name of the custom attribute to set
+#   value (any): Value to assign to the attribute
+
+name: set_custom_attribute_example
+priority: 20
+
+transformations:
+  - id: set_priority_high
+    type: set_custom_attribute
+    attribute: priority           # Custom attribute name
+    value: urgent                 # Custom attribute value (string)
+    rule_conditions:
+      - type: rule_attribute
+        attribute: level
+        value: high
+        op: gte
+
+# We use this to showcase that the custom attributes are set.
+postprocessing:
+- type: template
+  template: |+
+    [{{ rule.custom_attributes }}]

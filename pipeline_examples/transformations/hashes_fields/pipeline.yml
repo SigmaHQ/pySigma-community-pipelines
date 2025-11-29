@@ -1,0 +1,32 @@
+# Hashes Fields Transformation Example
+# Splits Hashes field into separate hash type fields
+#
+# Transformation: hashes_fields
+# Class: HashesFieldsDetectionItemTransformation
+#
+# Parameters:
+#   valid_hash_algos (list[str]): List of supported hash algorithms (REQUIRED)
+#   field_prefix (str): Prefix to add to generated field names (default: "")
+#   drop_algo_prefix (bool): If True, omits algorithm name from field name (default: False)
+#
+# Converts: Hashes: 'MD5=ABC123|SHA256=DEF456'
+# Into: MD5: 'ABC123' and SHA256: 'DEF456'
+
+name: hashes_fields_example
+priority: 20
+
+transformations:
+  - id: split_hash_fields_with_prefix
+    type: hashes_fields
+    valid_hash_algos:            # REQUIRED: List of hash types to recognize
+      - MD5
+      - SHA1
+      - SHA256
+      - SHA512
+      - IMPHASH
+    field_prefix: "File"         # Adds File prefix: FileMD5, FileSHA256, etc.
+    drop_algo_prefix: false      # Keep algorithm name in field (FileMD5 not just File)
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows

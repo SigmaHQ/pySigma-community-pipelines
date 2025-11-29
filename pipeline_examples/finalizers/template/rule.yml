@@ -1,0 +1,17 @@
+title: Template Finalizer Test
+id: 36345678-3456-1234-1234-123456789012
+status: test
+description: Test rule for template finalizer with Jinja2 templating
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        EventID: 1
+        CommandLine|contains: 'regedit.exe'
+    condition: selection
+falsepositives:
+    - Registry editing
+level: medium

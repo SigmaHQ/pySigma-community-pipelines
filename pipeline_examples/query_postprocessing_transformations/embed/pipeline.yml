@@ -1,0 +1,27 @@
+# Embed Query Postprocessing Transformation Example
+# Type: embed
+#
+# Description:
+# The embed transformation wraps the generated query with a prefix and/or suffix string.
+# This is useful for adding common search prefixes (like index specifications) or 
+# suffixes (like common aggregations or limits).
+#
+# Parameters:
+# - prefix: String to add before the query (default: "")
+# - suffix: String to add after the query (default: "")
+#
+# Example Use Cases:
+# - Adding index specifications to queries
+# - Adding common filters or conditions
+# - Adding aggregations or result limits
+# - Wrapping queries in platform-specific syntax
+
+name: embed_postprocessing_example
+priority: 20
+
+postprocessing:
+  # Example 1: Simple prefix and suffix
+  - id: add_index_and_stats
+    type: embed
+    prefix: "index=windows EventID IN (1, 4688) "
+    suffix: " | stats count by EventID"

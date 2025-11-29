@@ -1,0 +1,16 @@
+title: JSON Finalizer Test
+id: 34345678-3456-1234-1234-123456789012
+status: test
+description: Test rule for JSON finalizer output
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        CommandLine|contains: 'calc.exe'
+    condition: selection
+falsepositives:
+    - Unknown
+level: low

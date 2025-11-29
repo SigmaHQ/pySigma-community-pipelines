@@ -1,0 +1,19 @@
+title: Set Field Test
+id: 72345678-1234-1234-1234-123456789012
+status: test
+description: Test rule for set field transformation
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\notepad.exe'
+    condition: selection
+fields:
+    - RandomField1
+    - RandomField2
+falsepositives:
+    - User activity
+level: informational

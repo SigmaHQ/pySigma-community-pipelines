@@ -1,0 +1,36 @@
+# Template Finalizer Example
+# Type: template
+#
+# Description:
+# The template finalizer applies a Jinja2 template to the entire list of queries.
+# This provides maximum flexibility for creating custom output formats with
+# conditional logic, loops, filters, and access to pipeline state.
+#
+# Parameters:
+# - template: Jinja2 template string
+# - path: (Optional) Path to template files directory
+# - autoescape: (Optional) Enable HTML/XML autoescaping (default: false)
+# - vars: (Optional) Path to Python file with helper functions and variables
+#
+# Available variables in template:
+# - queries: List of all converted queries
+# - pipeline: The processing pipeline with state information
+
+name: template_finalizer_example
+priority: 20
+
+finalizers:
+  - type: template
+    template: |
+      # Converted Sigma Rules
+      # Total Rules: {{ queries | length }}
+      
+      {% for query in queries %}
+      ## Query {{ loop.index }}
+      ```
+      {{ query }}
+      ```
+      
+      {% endfor %}
+      
+      # End of Report

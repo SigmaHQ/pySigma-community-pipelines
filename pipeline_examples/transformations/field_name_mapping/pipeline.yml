@@ -1,0 +1,167 @@
+# Field Name Mapping Transformation Example
+# This example showcases ALL available condition types in pySigma 0.11.x
+#
+# Transformation: field_name_mapping
+# Class: FieldMappingTransformation
+# 
+# Parameters:
+#   mapping (dict): Dictionary mapping source field names to target field name(s)
+#
+# This comprehensive example demonstrates all condition categories available in 0.11.23:
+# 1. rule_conditions - Apply transformation based on rule properties
+# 2. detection_item_conditions - Apply based on detection item values
+#
+# NOTE: field_name_conditions require pySigma >= 1.0.0 and are not shown here
+
+name: field_name_mapping_comprehensive_example
+priority: 20
+
+transformations:
+  # ========== INITIALIZE STATE FOR PROCESSING_STATE CONDITIONS ==========
+  # The state dict must be set by a set_state transformation BEFORE it can be checked
+  
+  - id: initialize_environment_state
+    type: set_state
+    key: environment
+    val: production
+  
+  # ========== RULE CONDITIONS ==========
+  
+  # Example 1: Logsource matching
+  - id: map_by_logsource
+    type: field_name_mapping
+    mapping:
+      EventID: event_id
+      User: user_name
+    rule_conditions:
+      - type: logsource           # Match on logsource attributes
+        category: process_creation
+        product: windows
+        # service: sysmon         # Optional service field
+
+  # Example 2: Contains specific field
+  - id: map_when_contains_field
+    type: field_name_mapping
+    mapping:
+      CommandLine: process_command_line
+    rule_conditions:
+      - type: contains_field      # Match if rule contains specific field
+        field: CommandLine
+
+  # Example 3: Contains detection item with field and value
+  - id: map_when_contains_detection_item
+    type: field_name_mapping
+    mapping:
+      Image: process_executable
+    rule_conditions:
+      - type: contains_detection_item  # Match if rule has field with specific value
+        field: Image
+        value: "test.exe"
+
+  # Example 4: Rule attribute matching
+  - id: map_by_rule_level
+    type: field_name_mapping
+    mapping:
+      ParentImage: parent_process_executable
+    rule_conditions:
+      - type: rule_attribute      # Match on rule metadata attributes
+        attribute: level          # Can be: id, title, status, date, level, etc.
+        value: high               # Value to match
+        op: eq                    # Operations: eq, ne, gte, gt, lte, lt
+
+  # Example 5: Tag matching
+  - id: map_by_tag
+    type: field_name_mapping
+    mapping:
+      TargetObject: registry_key
+    rule_conditions:
+      - type: tag                 # Match if rule has specific tag
+        tag: attack.t1055         # Tag in namespace.name format
+
+  # Example 6: Processing item applied
+  - id: map_after_previous_transformation
+    type: field_name_mapping
+    mapping:
+      DestinationIp: dest_ip
+    rule_conditions:
+      - type: processing_item_applied  # Match if another processing item was applied
+        processing_item_id: map_by_logsource
+
+  # Example 7: Processing state
+  - id: map_by_state
+    type: field_name_mapping
+    mapping:
+      SourceIp: src_ip
+    rule_conditions:
+      - type: processing_state    # Match on pipeline state variable
+        key: environment          # State key to check
+        val: production           # Expected value
+        op: eq                    # Operations: eq, ne, gte, gt, lte, lt
+
+  # Example 8: Is Sigma rule (not correlation rule)
+  - id: map_sigma_rules_only
+    type: field_name_mapping
+    mapping:
+      ProcessId: pid
+    rule_conditions:
+      - type: is_sigma_rule       # Match only regular Sigma rules
+
+  # ========== DETECTION ITEM CONDITIONS ==========
+
+  # Example 9: Match string pattern with regex
+  - id: map_when_value_matches_pattern
+    type: field_name_mapping
+    mapping:
+      TargetFileName: file_name # TargetFileName would be the one where the match is applied
+    detection_item_conditions:
+      - type: match_string        # Match if detection value matches regex
+        pattern: "^test\\.exe$"  # Regex pattern
+        cond: any                 # "any" or "all" for multi-value items
+        negate: false             # Set to true to invert match
+
+  # Example 10: Contains wildcard characters
+  - id: map_when_contains_wildcard
+    type: field_name_mapping
+    mapping:
+      Details: registry_details
+    detection_item_conditions:
+      - type: contains_wildcard   # Match if value contains * or ?
+        cond: any
+
+  # Example 11: Is null value
+  - id: map_when_value_is_null
+    type: field_name_mapping
+    mapping:
+      Optional: optional_field
+    detection_item_conditions:
+      - type: is_null             # Match null/empty values
+        cond: any
+
+  # Example 12: Rule-level processing item applied (proper way for field_name_mapping)
+  # This correctly uses rule_conditions to check if the rule was processed
+  - id: map_after_rule_processed
+    type: field_name_mapping
+    mapping:
+      Computer: hostname
+    rule_conditions:
+      - type: processing_item_applied
+        processing_item_id: map_when_value_matches_pattern
+
+  # ========== COMBINING MULTIPLE CONDITIONS ==========
+
+  # Example 13: Multiple conditions (all must match with AND logic)
+  - id: map_with_multiple_conditions
+    type: field_name_mapping
+    mapping:
+      IntegrityLevel: integrity_level
+    rule_conditions:
+      - type: logsource           # AND condition 1: logsource must match
+        category: process_creation
+        product: windows
+      - type: rule_attribute      # AND condition 2: level must be >= medium
+        attribute: level
+        value: medium
+        op: gte
+    detection_item_conditions:
+      - type: contains_wildcard   # AND condition 3: value must contain wildcard
+        cond: any

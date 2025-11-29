@@ -1,0 +1,17 @@
+# YAML Finalizer Example
+# Type: yaml
+#
+# Description:
+# The yaml finalizer outputs the list of all converted queries as a YAML array.
+# This is useful for creating human-readable configuration files that can be
+# easily edited and consumed by tools that prefer YAML format.
+#
+# Parameters:
+# - indent: Optional indentation level (default: None uses PyYAML defaults)
+
+name: yaml_finalizer_example
+priority: 20
+
+finalizers:
+  - type: yaml
+    indent: 2

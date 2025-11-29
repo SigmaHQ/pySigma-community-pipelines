@@ -1,0 +1,18 @@
+title: Drop Detection Item Test
+id: 18345678-2345-1234-1234-123456789012
+status: test
+description: Test rule for drop detection item transformation
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: registry_add
+    product: windows
+detection:
+    selection:
+        EventType: CreateKey         # This field will be dropped
+        TargetObject|contains: '\Software\Test'
+        Details: null
+    condition: selection
+falsepositives:
+    - Software installation
+level: low

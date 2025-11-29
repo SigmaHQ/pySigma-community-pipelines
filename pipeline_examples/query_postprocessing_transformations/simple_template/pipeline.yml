@@ -1,0 +1,23 @@
+# Simple Template Query Postprocessing Transformation Example
+# Type: simple_template
+#
+# Description:
+# The simple_template transformation replaces the query with a template using Python's
+# str.format() syntax. It provides access to the query, rule, and pipeline objects.
+#
+# Parameters:
+# - template: String template using {variable} placeholders
+#
+# Available placeholders:
+# - {query}
+# - {rule} 
+# - {pipeline}
+
+name: simple_template_postprocessing_example
+priority: 20
+
+postprocessing:
+  # Example 1: Embed query with rule metadata
+  - id: add_rule_metadata
+    type: simple_template
+    template: 'search index=windows {query} | eval rule_id="{rule.id}" | eval rule_title="{rule.title}" | eval severity="{rule.level}"'

@@ -1,0 +1,34 @@
+# Field Name Prefix Transformation Example
+# Adds a prefix to all field names
+#
+# Transformation: field_name_prefix
+# Class: AddFieldnamePrefixTransformation
+#
+# Parameters:
+#   prefix (str): The string to prepend to field names
+#
+# Use this to namespace all fields or add a category prefix
+# Example: All fields become win.*, event.*, or custom_prefix.*
+
+name: field_name_prefix_example
+priority: 20
+
+transformations:
+  - id: add_win_prefix_to_all
+    type: field_name_prefix
+    prefix: "win."               # Adds win. prefix to all field names
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: add_event_prefix_selective
+    type: field_name_prefix
+    prefix: "event_data."        # Adds event_data. prefix
+    field_name_cond_not: true    # Negates the field_name_conditions (apply to fields NOT matching)
+    field_name_conditions:
+      - type: processing_item_applied  # Don't apply if already processed by specific item
+        processing_item_id: field_mapping
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows

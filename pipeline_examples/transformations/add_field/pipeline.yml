@@ -1,0 +1,34 @@
+# Add Field Transformation Example
+# Adds one or more fields to the Sigma rule's output field list
+#
+# Transformation: add_field
+# Class: AddFieldTransformation
+#
+# Parameters:
+#   field (str or list[str]): Single field name or list of field names to add to rule output
+#
+# Use this to ensure specific fields are always included in query results
+# Useful for enrichment or ensuring context fields are returned
+
+name: add_field_example
+priority: 20
+
+transformations:
+  - id: add_single_context_field
+    type: add_field
+    field: ComputerName          # Adds single field to output
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: add_multiple_enrichment_fields
+    type: add_field
+    field:                       # Adds multiple fields to output
+      - SourceIP
+      - DestinationIP
+      - User
+      - ProcessGuid
+    rule_conditions:
+      - type: logsource
+        category: network_connection
+        product: windows

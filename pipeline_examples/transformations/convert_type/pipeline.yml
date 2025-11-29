@@ -1,0 +1,29 @@
+# Convert Type Transformation Example
+# Converts the data type of values
+#
+# Transformation: convert_type
+# Class: ConvertTypeTransformation
+#
+# Parameters:
+#   target_type (str): Target type - "str" for string or "num" for number
+
+name: convert_type_example
+priority: 20
+
+transformations:
+  - id: convert_eventid_to_number
+    type: convert_type
+    target_type: "num"           # Convert to numeric type
+    field_name_conditions:
+      - type: include_fields
+        fields: EventID
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: convert_process_id_to_string
+    type: convert_type
+    target_type: "str"           # Convert to string type
+    field_name_conditions:
+      - type: include_fields
+        fields: ProcessId

@@ -1,0 +1,28 @@
+# Set State Transformation Example
+# Sets pipeline state variables for tracking processing stages
+#
+# Transformation: set_state
+# Class: SetStateTransformation
+#
+# Parameters:
+#   key (str): State variable name
+#   val (any): State variable value (string, number, boolean, etc.)
+
+name: set_state_example
+priority: 20
+
+transformations:
+  - id: mark_initial_processing
+    type: set_state
+    key: processing_stage         # State key
+    val: started                  # State value (string)
+
+  - id: map_by_state
+    type: field_name_mapping
+    mapping:
+      Image: process_name
+    rule_conditions:
+      - type: processing_state    # Match on pipeline state variable
+        key: processing_stage          # State key to check
+        val: started           # Expected value
+        op: eq                    # Operations: eq, ne, gte, gt, lte, lt

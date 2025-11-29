@@ -1,0 +1,27 @@
+# Detection Item Failure Transformation Example
+# Raises an error for specific detection items that can't be processed
+#
+# Transformation: detection_item_failure
+# Class: DetectionItemFailureTransformation
+#
+# Parameters:
+#   message (str): Error message to display when detection item fails (REQUIRED)
+#
+# Use this with field_name_conditions or detection_item_conditions to fail
+# specific unsupported detection items while allowing the rule to continue
+
+name: detection_item_failure_example
+priority: 20
+
+transformations:
+  - id: fail_image_in_file_access
+    type: detection_item_failure
+    message: "CommandLine field is not captured in file access events"
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - CommandLine
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: file_access

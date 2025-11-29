@@ -1,0 +1,56 @@
+# Add Condition Transformation Example
+# Adds filter conditions to the Sigma rule detection logic
+#
+# Transformation: add_condition
+# Class: AddConditionTransformation
+#
+# Parameters:
+#   conditions (dict): Dictionary of field:value pairs to add as AND conditions
+#   name (str): Optional name for the detection item (auto-generated if not provided)
+#   template (bool): If True, values are treated as templates with $category, $product, $service placeholders
+#   negated (bool): If True, adds the condition as NOT
+
+name: add_condition_example
+priority: 20
+
+transformations:
+  - id: add_eventid_filter
+    type: add_condition
+    conditions:
+      EventID: 1                 # Adds EventID=1 condition
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows
+
+  - id: add_index_with_template
+    type: add_condition
+    conditions:
+      index: "logs-$product-*"   # Uses template with logsource product placeholder
+      sourcetype: "$service"     # Uses template with logsource service placeholder
+    template: true               # Enable template placeholder substitution
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: add_multiple_filters
+    type: add_condition
+    conditions:
+      EventCode:                 # Can specify multiple values as list
+        - 4624
+        - 4625
+      LogonType: 3
+    name: logon_filter           # Custom name for the detection item
+    rule_conditions:
+      - type: logsource
+        service: sysmon
+        product: windows
+
+  - id: add_negated_condition
+    type: add_condition
+    conditions:
+      User: SYSTEM
+    negated: true                # Adds NOT User=SYSTEM condition
+    rule_conditions:
+      - type: logsource
+        product: windows

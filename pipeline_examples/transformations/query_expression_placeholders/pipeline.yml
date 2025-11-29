@@ -1,0 +1,32 @@
+# Query Expression Placeholders Transformation Example
+# Replaces placeholder with backend-specific query expressions (e.g., lookups)
+#
+# Transformation: query_expression_placeholders
+# Class: QueryExpressionPlaceholderTransformation
+#
+# Parameters:
+#   expression (str): Query expression template with {field} and {id} placeholders (REQUIRED)
+#   mapping (dict): Optional mapping of placeholder names to identifiers
+#   include (list[str]): Optional list of placeholder names to handle (mutually exclusive with exclude)
+#   exclude (list[str]): Optional list of placeholder names to NOT handle (mutually exclusive with include)
+#
+# Replaces %placeholder% with backend-specific expressions like Splunk lookups
+# {field} is replaced with field name, {id} with placeholder name or mapped value
+
+name: query_expression_placeholders_example
+priority: 20
+
+transformations:
+  - id: splunk_lookup_expression
+    type: query_expression_placeholders
+    expression: "[ inputlookup {id}.csv | rename dest as {field} ]"  # REQUIRED: Expression template
+    include:                      # Only handle these placeholders
+      - threat_ips
+
+  - id: custom_subsearch_with_mapping
+    type: query_expression_placeholders
+    expression: "[ | inputlookup {id}.csv | rename dest as {field} ]"
+    mapping:                      # Maps placeholder names to lookup identifiers
+      malicious_domains: "nas"
+    include:
+      - malicious_domains

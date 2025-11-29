@@ -1,0 +1,22 @@
+title: Field Prefix Mapping Test
+id: 22345678-1234-1234-1234-123456789012
+status: test
+description: Test rule for field prefix mapping transformation
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        win.EventID: 1
+        sysmon.User|contains: 'admin'
+        ProcessName|endswith: '\powershell.exe'
+    condition: selection
+fields:
+    - win.EventID
+    - sysmon.User  
+    - ProcessName
+falsepositives:
+    - Administrative activity
+level: medium

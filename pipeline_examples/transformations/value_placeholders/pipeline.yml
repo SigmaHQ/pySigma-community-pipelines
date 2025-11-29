@@ -1,0 +1,32 @@
+# Value Placeholders Transformation Example
+# Replaces placeholder variables with values from vars section
+#
+# Transformation: value_placeholders
+# Class: ValueListPlaceholderTransformation
+#
+# Parameters:
+#   include (list[str]): Optional list of placeholder names to handle (mutually exclusive with exclude)
+#   exclude (list[str]): Optional list of placeholder names to NOT handle (mutually exclusive with include)
+#
+# Replaces %placeholder% with actual values defined in vars section of pipeline
+# Values can be strings, numbers, or lists
+
+name: value_placeholders_example
+priority: 20
+
+transformations:
+  - id: replace_client_hostnames
+    type: value_placeholders
+    include:                      # Only handle these specific placeholders
+      - client_hosts
+      - server_ips
+
+vars:                             # Variables referenced by placeholders
+  client_hosts:                   # Placeholder name
+    - "DESKTOP-*"                 # List of values to replace placeholder with
+    - "LAPTOP-*"
+    - "WORKSTATION-*"
+  server_ips:
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"

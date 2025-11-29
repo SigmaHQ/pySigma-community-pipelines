@@ -1,0 +1,15 @@
+# Wildcard Placeholders Transformation Example
+# Replaces placeholder variables with wildcards
+#
+# Transformation: wildcard_placeholders
+# Class: WildcardPlaceholderTransformation
+#
+# Replaces %placeholder% with * wildcard
+# Useful for placeholder variables not defined in vars section
+
+name: wildcard_placeholders_example
+priority: 20
+
+transformations:
+  - id: replace_specific_placeholders
+    type: wildcard_placeholders

@@ -1,0 +1,26 @@
+# Concatenate Queries Finalizer Example
+# Type: concat
+#
+# Description:
+# The concat finalizer concatenates all generated queries with a specified separator
+# and optionally adds a prefix and/or suffix to the entire result. This is the most
+# commonly used finalizer for combining multiple rules into a single output.
+#
+# Parameters:
+# - separator: String to insert between queries (default: "\n")
+# - prefix: String to add before all queries (default: "")
+# - suffix: String to add after all queries (default: "")
+
+name: concat_finalizer_example
+priority: 20
+
+finalizers:
+  - type: concat
+    separator: "\n\n"
+    prefix: |
+      # Sigma Rules Converted to Splunk
+      # Generated: 2099-12-13
+      
+    suffix: |
+      
+      # End of converted rules

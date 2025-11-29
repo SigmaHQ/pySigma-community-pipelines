@@ -1,0 +1,18 @@
+title: Value Placeholders Test
+id: 23345678-3456-1234-1234-123456789012
+status: test
+description: Test rule for value placeholders transformation
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\malware.exe'
+        DestinationIp|expand: '%server_ips%'      # Will be replaced with values from vars
+        ComputerName|expand: '%client_hosts%'     # Will be replaced with values from vars
+    condition: selection
+falsepositives:
+    - Legitimate connections
+level: high

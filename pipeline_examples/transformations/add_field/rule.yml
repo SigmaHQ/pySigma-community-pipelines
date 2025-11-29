@@ -1,0 +1,19 @@
+title: Network Connection Test
+id: 52345678-1234-1234-1234-123456789012
+status: test
+description: Test rule for add field transformation
+author: Test Author
+date: 2025-01-01
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection:
+        Initiated: 'true'
+        DestinationPort: 443
+    condition: selection
+fields:
+    - Image
+falsepositives:
+    - Normal browsing
+level: low

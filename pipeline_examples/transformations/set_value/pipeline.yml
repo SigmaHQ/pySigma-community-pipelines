@@ -1,0 +1,35 @@
+# Set Value Transformation Example
+# Sets detection item values to a fixed value
+#
+# Transformation: set_value
+# Class: SetValueTransformation
+#
+# Parameters:
+#   value (str, int, float, or bool): The value to set
+#   force_type (str): Optional type enforcement - "str" or "num"
+
+name: set_value_example
+priority: 20
+
+transformations:
+  - id: set_initiated_to_true
+    type: set_value
+    value: "true"                # Sets value to string "true"
+    force_type: "str"            # Force as string type
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - Initiated
+    rule_conditions:
+      - type: logsource
+        category: network_connection
+        product: windows
+
+  - id: set_port_number
+    type: set_value
+    value: 443                   # Sets value to number 443
+    force_type: "num"            # Force as numeric type
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - DestinationPort

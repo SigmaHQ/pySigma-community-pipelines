@@ -1,0 +1,45 @@
+# Case Transformation Example
+# Changes the case of string values
+#
+# Transformation: case
+# Class: CaseTransformation
+# Version: pySigma >= 1.0.0 (not available in 0.11.x)
+#
+# Parameters:
+#   method (str): Case transformation method - "lower", "upper", or "snake_case"
+
+name: case_example
+priority: 20
+
+transformations:
+  - id: lowercase_usernames
+    type: case
+    method: lower                # Convert to lowercase
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - User
+          - TargetUserName
+          - SubjectUserName
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: uppercase_hashes
+    type: case
+    method: upper                # Convert to uppercase
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - MD5
+          - SHA256
+          - SHA1
+          - Hashes
+
+  - id: snake_case_fields
+    type: case
+    method: snake_case           # Convert to snake_case
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - CommandLine

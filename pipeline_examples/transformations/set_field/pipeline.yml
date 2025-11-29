@@ -1,0 +1,29 @@
+# Set Field Transformation Example
+# Sets the Sigma rule's output field list to a specific set of fields
+#
+# Transformation: set_field
+# Class: SetFieldTransformation
+#
+# Parameters:
+#   fields (list[str]): List of field names to set as the complete output field list
+#                       Replaces any existing fields
+#
+# Use this to enforce a standard set of output fields regardless of rule content
+
+name: set_field_example
+priority: 20
+
+transformations:
+  - id: set_standard_output_fields
+    type: set_field
+    fields:                      # Sets complete field list (replaces existing)
+      - EventID
+      - User
+      - Image
+      - CommandLine
+      - ComputerName
+      - TimeCreated
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows

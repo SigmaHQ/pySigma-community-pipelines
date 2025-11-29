@@ -1,0 +1,44 @@
+# Map String Transformation Example
+# Maps specific string values to other string values or lists
+#
+# Transformation: map_string
+# Class: MapStringTransformation
+#
+# Parameters:
+#   mapping (dict): Dictionary mapping source values to target value(s)
+#                   Keys: Original string values to match
+#                   Values: String (single target) or list of strings (multiple targets)
+
+name: map_string_example
+priority: 20
+
+transformations:
+  - id: map_event_types
+    type: map_string
+    mapping:
+      'CreateKey': 'registry_add'
+      'SetValue': 'registry_set'
+      'DeleteKey': 'registry_delete'
+      'DeleteValue': 'registry_delete'
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - EventType
+    rule_conditions:
+      - type: logsource
+        category: registry_event
+        product: windows
+
+  - id: map_protocols
+    type: map_string
+    mapping:
+      'DWORD (0x00000001)':                     # Can map to multiple values (creates OR condition)
+        - 'DWORD (0x00000001)'
+        - '0x00000001'
+      'DWORD (0x00000000)':
+        - 'DWORD (0x00000000)'
+        - '0x00000000'
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - Details

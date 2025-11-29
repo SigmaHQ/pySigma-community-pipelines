@@ -1,0 +1,18 @@
+title: Set State Test
+id: 17345678-2345-1234-1234-123456789012
+status: test
+description: Test rule for set state transformation
+author: Test Author
+date: 2025-01-01
+tags:
+    - attack.execution
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\test.exe'
+    condition: selection
+falsepositives:
+    - Testing
+level: low

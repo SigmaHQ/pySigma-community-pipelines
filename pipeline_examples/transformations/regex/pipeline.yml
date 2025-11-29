@@ -1,0 +1,35 @@
+# Regex Transformation Example
+# Transforms string values to case-insensitive regular expressions
+#
+# Transformation: regex
+# Class: RegexTransformation
+#
+# Parameters:
+#   method (str): Transformation method - "plain", "ignore_case_flag", or "ignore_case_brackets"
+#                 - plain: No case modification (usually case-sensitive)
+#                 - ignore_case_flag: Adds (?i) flag to regex
+#                 - ignore_case_brackets: Wraps each char in [aA] brackets (default)
+
+name: regex_example
+priority: 20
+
+transformations:
+  - id: case_insensitive_brackets
+    type: regex
+    method: ignore_case_brackets # Transforms to [Pp][Oo][Ww][Ee][Rr][Ss][Hh][Ee][Ll][Ll]
+    field_name_conditions:
+      - type: include_fields
+        fields: Image
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: case_insensitive_flag
+    type: regex
+    method: ignore_case_flag     # Adds (?i) flag to beginning of regex
+    field_name_conditions:
+      - type: include_fields
+        fields: User
+    rule_conditions:
+      - type: logsource
+        product: windows

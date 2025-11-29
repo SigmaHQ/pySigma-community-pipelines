@@ -1,0 +1,27 @@
+# Field Name Prefix Mapping Transformation Example
+# Maps field name prefixes to different prefixes
+#
+# Transformation: field_name_prefix_mapping  
+# Class: FieldPrefixMappingTransformation
+#
+# Parameters:
+#   mapping (dict): Dictionary mapping source prefixes to target prefix(es)
+#                   Keys: Original field name prefixes (cannot be None)
+#                   Values: String (single target prefix) or list of strings (multiple prefixes)
+#
+# Use this to remap entire groups of fields with common prefixes
+# Example: win.* -> event_data.* or process.* -> proc.*
+
+name: field_name_prefix_mapping_example
+priority: 20
+
+transformations:
+  - id: map_windows_prefixes
+    type: field_name_prefix_mapping
+    mapping:
+      win.: event_data.          # Maps all win.* fields to event_data.*
+      sysmon.: windows.sysmon.   # Maps all sysmon.* fields to windows.sysmon.*
+      Process: proc.             # Maps all Process* fields to proc.*
+    rule_conditions:
+      - type: logsource
+        product: windows

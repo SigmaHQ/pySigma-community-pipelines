@@ -1,0 +1,19 @@
+# JSON Query Postprocessing Transformation Example
+# Type: json
+#
+# Description:
+# The json transformation embeds a query into a JSON structure. The placeholder
+# value "%QUERY%" in the JSON template is replaced with the actual query string.
+# This is useful for creating structured API payloads or configuration formats.
+#
+# Parameters:
+# - json_template: JSON string with %QUERY% placeholder
+#
+
+name: json_postprocessing_example
+priority: 20
+
+postprocessing:
+  - id: simple_json_wrapper
+    type: json
+    json_template: '{"search": "%QUERY%", "index": "windows", "earliest_time": "-24h"}'

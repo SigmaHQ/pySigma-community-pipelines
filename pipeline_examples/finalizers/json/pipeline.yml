@@ -1,0 +1,18 @@
+# JSON Finalizer Example
+# Type: json
+#
+# Description:
+# The json finalizer outputs the list of all converted queries as a JSON array.
+# This is useful for creating machine-readable output that can be consumed by
+# other tools, APIs, or automation scripts.
+#
+# Parameters:
+# - indent: Optional indentation level for pretty-printing (default: None for compact output)
+
+
+name: json_finalizer_example
+priority: 20
+
+finalizers:
+  - type: json
+    indent: 2

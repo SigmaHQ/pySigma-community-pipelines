@@ -1,0 +1,32 @@
+# Change Logsource Transformation Example
+# Modifies the logsource definition of a Sigma rule
+#
+# Transformation: change_logsource
+# Class: ChangeLogsourceTransformation
+#
+# Parameters:
+#   category (str): Optional new category
+#   product (str): Optional new product
+#   service (str): Optional new service
+
+name: change_logsource_example
+priority: 20
+
+transformations:
+  - id: change_to_security_eventlog
+    type: change_logsource
+    product: windows              # Set product to windows
+    category: security            # Set category to security
+    service: eventlog             # Set service to eventlog
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows
+
+  - id: change_service_only
+    type: change_logsource
+    service: sysmon               # Only change service, keep category and product
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation

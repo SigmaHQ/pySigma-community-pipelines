@@ -1,0 +1,35 @@
+# Field Name Suffix Transformation Example
+# Adds a suffix to all field names
+#
+# Transformation: field_name_suffix
+# Class: AddFieldnameSuffixTransformation
+#
+# Parameters:
+#   suffix (str): The string to append to field names
+#
+# Use this to add qualifiers or type indicators to field names
+# Example: All fields become *.keyword, *.raw, or *_original
+
+name: field_name_suffix_example
+priority: 20
+
+transformations:
+  - id: add_keyword_suffix
+    type: field_name_suffix
+    suffix: ".keyword"           # Adds .keyword suffix to all field names (useful for Elasticsearch)
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  - id: add_raw_suffix_selective
+    type: field_name_suffix
+    suffix: "_raw"               # Adds _raw suffix
+    field_name_conditions:
+      - type: include_fields     # Only apply to specific fields
+        fields:
+          - CommandLine
+          - ParentCommandLine
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: windows

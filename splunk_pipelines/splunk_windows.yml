@@ -1,0 +1,594 @@
+####
+# Author: Nasreddine Bencherchali
+# Date: 2025-12-01
+# Splunk Windows Event Log Mapping Pipeline
+# 
+# Inspired by: https://github.com/joshnck/splunk_sigma_yml_pipeline/blob/main/win_sysmon_eventcode_mapping/win_event_splunk_pipeline.yml
+
+name: Splunk Windows Event Log Mapping Pipeline
+priority: 20
+
+transformations:
+  ################################
+  # FIELD NAME REWRITING
+  # Rewrite EventID to EventCode to match Splunk TA field extraction
+  ################################
+  
+  - id: splunk_windows_eventid_to_eventcode
+    type: field_name_mapping
+    mapping:
+      EventID: EventCode
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  ################################
+  # INDEX CONDITIONS
+  ################################
+  
+  # Windows events go to win index
+  - id: splunk_windows_index
+    type: add_condition
+    conditions:
+      index: win
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  ################################
+  # WINDOWS SECURITY EVENT MAPPINGS
+  ################################
+
+  # EventCode 4688 - Process Creation (Windows Security)
+  - id: splunk_security_process_creation
+    type: add_condition
+    conditions:
+      EventCode: 4688
+      sourcetype: "XmlWinEventLog:Security"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation
+
+  # Field mapping for Security event 4688
+  - id: splunk_security_process_creation_fieldmap
+    type: field_name_mapping
+    mapping:
+      Image: NewProcessName
+      ParentImage: ParentProcessName
+      CommandLine: CommandLine
+      User: SubjectUserName
+      LogonId: SubjectLogonId
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation
+      - type: processing_item_applied
+        processing_item_id: splunk_security_process_creation
+
+  ################################
+  # POWERSHELL EVENT MAPPINGS
+  ################################
+
+  # EventID 4103 - Module Logging (PowerShell Operational)
+  - id: splunk_powershell_module
+    type: add_condition
+    conditions:
+      EventCode: 4103
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-PowerShell/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: ps_module
+
+  # EventID 4104 - Script Block Logging (PowerShell Operational)
+  - id: splunk_powershell_script
+    type: add_condition
+    conditions:
+      EventCode: 4104
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-PowerShell/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: ps_script
+
+  # EventID 400 - Engine Lifecycle (PowerShell Classic)
+  - id: splunk_powershell_classic_start
+    type: add_condition
+    conditions:
+      EventCode: 400
+      sourcetype: "WinEventLog:Windows PowerShell"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: ps_classic_start
+
+  # EventID 600 - Provider Lifecycle (PowerShell Classic)
+  - id: splunk_powershell_classic_provider_start
+    type: add_condition
+    conditions:
+      EventCode: 600
+      sourcetype: "WinEventLog:Windows PowerShell"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: ps_classic_provider_start
+
+  # EventID 800 - Pipeline Execution Details (PowerShell Classic)
+  - id: splunk_powershell_classic_script
+    type: add_condition
+    conditions:
+      EventCode: 800
+      sourcetype: "WinEventLog:Windows PowerShell"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: ps_classic_script
+
+  ################################
+  # WINDOWS SERVICE MAPPINGS
+  # Based on Splunk_TA_windows props.conf
+  ################################
+
+  # Windows Security Log
+  - id: splunk_windows_security
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Security"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security
+
+  # Windows System Log
+  - id: splunk_windows_system
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:System"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: system
+
+  # Windows Application Log
+  - id: splunk_windows_application
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Application"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: application
+
+  # PowerShell Operational
+  - id: splunk_windows_powershell
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-PowerShell/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: powershell
+
+  # PowerShell Classic
+  - id: splunk_windows_powershell_classic
+    type: add_condition
+    conditions:
+      sourcetype: "WinEventLog:Windows PowerShell"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: powershell-classic
+
+  # Task Scheduler
+  - id: splunk_windows_taskscheduler
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-TaskScheduler/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: taskscheduler
+
+  # WMI Activity
+  - id: splunk_windows_wmi
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: wmi
+
+  # NTLM
+  - id: splunk_windows_ntlm
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-NTLM/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: ntlm
+
+  # DNS Server
+  - id: splunk_windows_dns_server
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:DNS Server"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: dns-server
+
+  # DNS Client
+  - id: splunk_windows_dns_client
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-DNS Client Events/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: dns-client
+
+  # DHCP Server
+  - id: splunk_windows_dhcp
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-DHCP-Server/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: dhcp
+
+  # Windows Defender
+  - id: splunk_windows_defender
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: windefend
+
+  # Windows Defender Antivirus Category Mapping
+  - id: splunk_windows_defender_antivirus
+    type: add_condition
+    conditions:
+      EventCode:
+        - 1006
+        - 1007
+        - 1008
+        - 1009
+        - 1010
+        - 1011
+        - 1012
+        - 1017
+        - 1018
+        - 1019
+        - 1115
+        - 1116
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"
+    rule_conditions:
+      - type: logsource
+        category: antivirus
+
+  # Field mapping for Windows Defender
+  - id: splunk_windows_defender_fieldmap
+    type: field_name_mapping
+    mapping:
+      Signature: "Threat Name"
+      Filename: Path
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: windefend
+
+  # Firewall with Advanced Security
+  - id: splunk_windows_firewall
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Windows Firewall With Advanced Security/Firewall"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: firewall-as
+
+  # AppLocker
+  - id: splunk_windows_applocker
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-AppLocker/*"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: applocker
+
+  # SMB Client Security
+  - id: splunk_windows_smbclient_security
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-SmbClient/Security"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: smbclient-security
+
+  # SMB Client Connectivity
+  - id: splunk_windows_smbclient_connectivity
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-SmbClient/Connectivity"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: smbclient-connectivity
+
+  # Terminal Services
+  - id: splunk_windows_terminalservices
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: terminalservices-localsessionmanager
+
+  # Code Integrity
+  - id: splunk_windows_codeintegrity
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-CodeIntegrity/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: codeintegrity-operational
+
+  # BITS Client
+  - id: splunk_windows_bits
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Bits-Client/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: bits-client
+
+  # Print Service Operational
+  - id: splunk_windows_printservice_operational
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-PrintService/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: printservice-operational
+
+  # Print Service Admin
+  - id: splunk_windows_printservice_admin
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-PrintService/Admin"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: printservice-admin
+
+  # LSA Server
+  - id: splunk_windows_lsa
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-LSA/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: lsa-server
+
+  # NTFS
+  - id: splunk_windows_ntfs
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Ntfs/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: ntfs
+
+  # Kernel ShimEngine
+  - id: splunk_windows_shimengine
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Kernel-ShimEngine/*"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: kernel-shimengine
+
+  # Application Experience
+  - id: splunk_windows_application_experience
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Application-Experience/*"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: application-experience
+
+  # BitLocker
+  - id: splunk_windows_bitlocker
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-BitLocker/BitLocker Management"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: bitlocker
+
+  # VHDMP
+  - id: splunk_windows_vhdmp
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-VHDMP/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: vhdmp
+
+  # AppX Deployment
+  - id: splunk_windows_appxdeployment
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-AppXDeploymentServer/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: appxdeployment-server
+
+  # AppX Packaging
+  - id: splunk_windows_appxpackaging
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-AppxPackaging/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: appxpackaging-om
+
+  # AppModel Runtime
+  - id: splunk_windows_appmodel_runtime
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-AppModel-Runtime/Admin"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: appmodel-runtime
+
+  # CAPI2
+  - id: splunk_windows_capi2
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-CAPI2/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: capi2
+
+  # Certificate Services Client
+  - id: splunk_windows_certificateservicesclient
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-CertificateServicesClient-Lifecycle-System/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: certificateservicesclient-lifecycle-system
+
+  # Security Mitigations
+  - id: splunk_windows_security_mitigations
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Security-Mitigations/*"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security-mitigations
+
+  # Diagnosis Scripted
+  - id: splunk_windows_diagnosis_scripted
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Diagnosis-Scripted/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: diagnosis-scripted
+
+  # Shell Core
+  - id: splunk_windows_shell_core
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Shell-Core/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: shell-core
+
+  # OpenSSH
+  - id: splunk_windows_openssh
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:OpenSSH/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: openssh
+
+  # LDAP Client
+  - id: splunk_windows_ldap
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-LDAP-Client/Debug"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: ldap
+
+  # Hyper-V Worker
+  - id: splunk_windows_hyper_v_worker
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Hyper-V-Worker"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: hyper-v-worker
+
+  # Kernel Event Tracing
+  - id: splunk_windows_kernel_event_tracing
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Kernel-EventTracing"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: kernel-event-tracing
+
+  # Windows Defender ATP (SENSE)
+  - id: splunk_windows_defender_atp
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-SENSE/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: sense
+
+  # Service Bus Client
+  - id: splunk_windows_servicebus
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-ServiceBus-Client/*"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: servicebus-client
+
+  # IIS Configuration
+  - id: splunk_windows_iis_configuration
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-IIS-Configuration/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: iis-configuration
+
+  # MSExchange Management
+  - id: splunk_windows_msexchange
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:MSExchange Management"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: msexchange-management

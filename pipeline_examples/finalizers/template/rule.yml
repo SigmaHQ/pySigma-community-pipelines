@@ -10,6 +10,7 @@ logsource:
 detection:
     selection:
         EventID: 1
+        Image: 'cmd.exe'
         CommandLine|contains: 'regedit.exe'
     condition: selection
 falsepositives:

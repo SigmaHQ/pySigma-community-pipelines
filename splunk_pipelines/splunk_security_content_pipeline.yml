@@ -1,3 +1,6 @@
+###
+# Author: Nasreddine Bencherchali
+# Date: 2025-12-01
 # Splunk Security Content - Detection Format Pipeline
 # Converts Sigma rules to Splunk detection format compatible with the Splunk Security Content repository.
 #

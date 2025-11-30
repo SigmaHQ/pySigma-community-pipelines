@@ -1,0 +1,448 @@
+####
+# Author: Nasreddine Bencherchali
+# Date: 2025-12-01
+# Splunk Sysmon Event Mapping Pipeline
+# 
+# Inspired by: https://github.com/joshnck/splunk_sigma_yml_pipeline/blob/main/win_sysmon_eventcode_mapping/win_event_splunk_pipeline.yml
+
+name: Splunk Sysmon Mapping Pipeline
+priority: 20
+allowed_backends:
+  - splunk
+
+transformations:
+  ################################
+  # FIELD NAME REWRITING
+  # Rewrite EventID to EventCode to match Splunk TA field extraction
+  ################################
+  
+  - id: splunk_sysmon_eventid_to_eventcode
+    type: field_name_mapping
+    mapping:
+      EventID: EventCode
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  ################################
+  # INDEX CONDITIONS
+  ################################
+  
+  # Windows events go to win index
+  - id: splunk_sysmon_index
+    type: add_condition
+    conditions:
+      index: win
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: sysmon
+
+  ################################
+  # SYSMON EVENT MAPPINGS
+  ################################
+
+  # EventID 1 - Process Creation (Sysmon)
+  - id: splunk_sysmon_process_creation
+    type: add_condition
+    conditions:
+      EventCode: 1
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation
+
+  # EventID 2 - File Creation Time Changed
+  - id: splunk_sysmon_file_change
+    type: add_condition
+    conditions:
+      EventCode: 2
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: file_change
+
+  # EventID 3 - Network Connection
+  - id: splunk_sysmon_network_connection
+    type: add_condition
+    conditions:
+      EventCode: 3
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: network_connection
+
+  # EventID 4 - Sysmon Service State Changed
+  - id: splunk_sysmon_status_4
+    type: add_condition
+    conditions:
+      EventCode: 4
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: sysmon_status
+
+  # EventID 5 - Process Terminated
+  - id: splunk_sysmon_process_termination
+    type: add_condition
+    conditions:
+      EventCode: 5
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_termination
+
+  # EventID 6 - Driver Loaded
+  - id: splunk_sysmon_driver_load
+    type: add_condition
+    conditions:
+      EventCode: 6
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: driver_load
+
+  # EventID 7 - Image/DLL Loaded
+  - id: splunk_sysmon_image_load
+    type: add_condition
+    conditions:
+      EventCode: 7
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: image_load
+
+  # EventID 8 - CreateRemoteThread
+  - id: splunk_sysmon_create_remote_thread
+    type: add_condition
+    conditions:
+      EventCode: 8
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: create_remote_thread
+
+  # EventID 9 - RawAccessRead
+  - id: splunk_sysmon_raw_access_thread
+    type: add_condition
+    conditions:
+      EventCode: 9
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: raw_access_thread
+
+  # EventID 10 - ProcessAccess
+  - id: splunk_sysmon_process_access
+    type: add_condition
+    conditions:
+      EventCode: 10
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_access
+
+  # EventID 11 - FileCreate
+  - id: splunk_sysmon_file_event
+    type: add_condition
+    conditions:
+      EventCode: 11
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: file_event
+
+  # EventID 12 - Registry Object Added or Deleted (CreateKey, DeleteKey, DeleteValue)
+  - id: splunk_sysmon_registry_add
+    type: add_condition
+    conditions:
+      EventCode: 12
+      EventType: "CreateKey"
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_add
+
+  - id: splunk_sysmon_registry_delete
+    type: add_condition
+    conditions:
+      EventCode: 12
+      EventType: "DeleteKey"
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_delete
+
+  # EventID 13 - Registry Value Set
+  - id: splunk_sysmon_registry_set
+    type: add_condition
+    conditions:
+      EventCode: 13
+      EventType: "SetValue"
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_set
+
+  # EventID 14 - Registry Object Renamed
+  - id: splunk_sysmon_registry_rename
+    type: add_condition
+    conditions:
+      EventCode: 14
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_rename
+
+  # EventID 12, 13, 14 - Generic Registry Event
+  - id: splunk_sysmon_registry_event
+    type: add_condition
+    conditions:
+      EventCode:
+        - 12
+        - 13
+        - 14
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_event
+
+  # EventID 15 - FileCreateStreamHash (NTFS Alternate Data Stream)
+  - id: splunk_sysmon_create_stream_hash
+    type: add_condition
+    conditions:
+      EventCode: 15
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: create_stream_hash
+
+  # EventID 16 - Sysmon Config State Changed
+  - id: splunk_sysmon_status_16
+    type: add_condition
+    conditions:
+      EventCode: 16
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: sysmon_status
+
+  # EventID 17 - Pipe Created
+  - id: splunk_sysmon_pipe_created_17
+    type: add_condition
+    conditions:
+      EventCode: 17
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: pipe_created
+
+  # EventID 18 - Pipe Connected
+  - id: splunk_sysmon_pipe_connected
+    type: add_condition
+    conditions:
+      EventCode: 18
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: pipe_created
+
+  # EventID 19 - WmiEventFilter Activity
+  # EventID 20 - WmiEventConsumer Activity  
+  # EventID 21 - WmiEventConsumerToFilter Activity
+  - id: splunk_sysmon_wmi_event
+    type: add_condition
+    conditions:
+      EventCode:
+        - 19
+        - 20
+        - 21
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: wmi_event
+
+  # EventID 22 - DNS Query
+  - id: splunk_sysmon_dns_query
+    type: add_condition
+    conditions:
+      EventCode: 22
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: dns_query
+
+  # EventID 23 - File Delete
+  - id: splunk_sysmon_file_delete
+    type: add_condition
+    conditions:
+      EventCode: 23
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: file_delete
+
+  # EventID 24 - Clipboard Change
+  - id: splunk_sysmon_clipboard_change
+    type: add_condition
+    conditions:
+      EventCode: 24
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: clipboard_change
+
+  # EventID 25 - Process Tampering
+  - id: splunk_sysmon_process_tampering
+    type: add_condition
+    conditions:
+      EventCode: 25
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_tampering
+
+  # EventID 26 - File Delete Detected
+  - id: splunk_sysmon_file_delete_detected
+    type: add_condition
+    conditions:
+      EventCode: 26
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: file_delete_detected
+
+  # EventID 27 - File Block Executable
+  - id: splunk_sysmon_file_block_executable
+    type: add_condition
+    conditions:
+      EventCode: 27
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: file_block_executable
+
+  # EventID 28 - File Block Shredding
+  - id: splunk_sysmon_file_block_shredding
+    type: add_condition
+    conditions:
+      EventCode: 28
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: file_block_shredding
+
+  # EventID 29 - File Executable Detected
+  - id: splunk_sysmon_file_executable_detected
+    type: add_condition
+    conditions:
+      EventCode: 29
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: file_executable_detected
+
+  # EventID 255 - Sysmon Error
+  - id: splunk_sysmon_error
+    type: add_condition
+    conditions:
+      EventCode: 255
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: sysmon_error
+
+  # Service logsource mapping
+  - id: splunk_sysmon_service
+    type: add_condition
+    conditions:
+      sourcetype: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: sysmon
+
+  ################################
+  # FIELD MAPPINGS
+  # Sysmon field name translations for Splunk
+  # Based on Splunk_TA_microsoft_sysmon props.conf
+  ################################
+
+  - id: splunk_sysmon_fieldmap
+    type: field_name_mapping
+    mapping:
+      ProcessId: process_id
+      ProcessGuid: process_guid
+      Image: process_path
+      OriginalFileName: original_file_name
+      CommandLine: process
+      CurrentDirectory: process_current_directory
+      User: user
+      IntegrityLevel: process_integrity_level
+      ParentProcessGuid: parent_process_guid
+      ParentProcessId: parent_process_id
+      ParentImage: parent_process_path
+      ParentCommandLine: parent_process
+      TargetFilename: file_path
+      CreationUtcTime: file_create_time
+      SourceIp: src
+      SourceHostname: src_host
+      SourcePort: src_port
+      DestinationIp: dest
+      DestinationHostname: dest_host
+      DestinationPort: dest_port
+      Protocol: transport
+      ImageLoaded: loaded_file
+      Signed: service_signature_exists
+      SignatureStatus: service_signature_verified
+      SourceProcessId: parent_process_id
+      SourceProcessGuid: parent_process_guid
+      SourceImage: parent_process_path
+      TargetProcessId: process_id
+      TargetProcessGuid: process_guid
+      TargetImage: process_path
+      StartAddress: src_address
+      StartModule: src_module
+      StartFunction: src_function
+      GrantedAccess: granted_access
+      TargetObject: registry_path
+      Details: registry_value_data
+      NewName: object_path
+      Hash: file_hash
+      PipeName: pipe_name
+      Operation: action
+      QueryName: query
+      QueryStatus: reply_code_id
+    rule_conditions:
+      - type: logsource
+        product: windows

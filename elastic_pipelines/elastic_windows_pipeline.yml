@@ -1,0 +1,525 @@
+####
+# Author: Nasreddine Bencherchali
+# Date: 2025-12-01
+# pySigma Elastic Common Schema Windows log mappings pipeline
+#
+# This pipeline provides comprehensive mappings for Windows event logs to ECS format.
+# It supports Elasticsearch, EQL, Lucene, and OpenSearch backends.
+
+name: Elastic Common Schema (ECS) Windows log mappings from Winlogbeat from version 7
+priority: 20
+allowed_backends:
+  - elasticsearch
+  - eql
+  - lucene
+  - opensearch
+
+transformations:
+  ################################
+  # WINDOWS LOGSOURCE CHANNEL MAPPINGS
+  # Maps Sigma logsources to winlog.channel field
+  ################################
+
+  # Application log
+  - id: ecs_windows_logsource_application
+    type: add_condition
+    conditions:
+      winlog.channel: Application
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: application
+
+  # Security log
+  - id: ecs_windows_logsource_security
+    type: add_condition
+    conditions:
+      winlog.channel: Security
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security
+
+  # System log
+  - id: ecs_windows_logsource_system
+    type: add_condition
+    conditions:
+      winlog.channel: System
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: system
+
+  # Sysmon
+  - id: ecs_windows_logsource_sysmon
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-Sysmon/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: sysmon
+
+  # PowerShell
+  - id: ecs_windows_logsource_powershell
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-PowerShell/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: powershell
+
+  # PowerShell Classic
+  - id: ecs_windows_logsource_powershell_classic
+    type: add_condition
+    conditions:
+      winlog.channel: Windows PowerShell
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: powershell-classic
+
+  # Task Scheduler
+  - id: ecs_windows_logsource_taskscheduler
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-TaskScheduler/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: taskscheduler
+
+  # WMI
+  - id: ecs_windows_logsource_wmi
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-WMI-Activity/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: wmi
+
+  # Windows Defender
+  - id: ecs_windows_logsource_windefend
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-Windows Defender/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: windefend
+
+  # NTLM
+  - id: ecs_windows_logsource_ntlm
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-NTLM/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: ntlm
+
+  # DNS Server
+  - id: ecs_windows_logsource_dns_server
+    type: add_condition
+    conditions:
+      winlog.channel: DNS Server
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: dns-server
+
+  # Firewall
+  - id: ecs_windows_logsource_firewall_as
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: firewall-as
+
+  # AppLocker (multiple channels)
+  - id: ecs_windows_logsource_applocker_exe_dll
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-AppLocker/EXE and DLL
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: applocker
+
+  # BitLocker
+  - id: ecs_windows_logsource_bitlocker
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-BitLocker/BitLocker Management
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: bitlocker
+
+  # Code Integrity
+  - id: ecs_windows_logsource_codeintegrity
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-CodeIntegrity/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: codeintegrity-operational
+
+  # BITS Client
+  - id: ecs_windows_logsource_bits
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-Bits-Client/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: bits-client
+
+  # Driver Framework
+  - id: ecs_windows_logsource_driver_framework
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-DriverFrameworks-UserMode/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: driver-framework
+
+  # LDAP Debug
+  - id: ecs_windows_logsource_ldap_debug
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-LDAP-Client/Debug
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: ldap_debug
+
+  # LSA Server
+  - id: ecs_windows_logsource_lsa_server
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-LSA/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: lsa-server
+
+  # NTFS
+  - id: ecs_windows_logsource_ntfs
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-Ntfs/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: ntfs
+
+  # OpenSSH
+  - id: ecs_windows_logsource_openssh
+    type: add_condition
+    conditions:
+      winlog.channel: OpenSSH/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: openssh
+
+  # PrintService Admin
+  - id: ecs_windows_logsource_printservice_admin
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-PrintService/Admin
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: printservice-admin
+
+  # PrintService Operational
+  - id: ecs_windows_logsource_printservice_operational
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-PrintService/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: printservice-operational
+
+  # SMB Client Security
+  - id: ecs_windows_logsource_smbclient_security
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-SmbClient/Security
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: smbclient-security
+
+  # Terminal Services
+  - id: ecs_windows_logsource_terminalservices
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-TerminalServices-LocalSessionManager/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: terminalservices-localsessionmanager
+
+  # WinRM
+  - id: ecs_windows_logsource_winrm
+    type: add_condition
+    conditions:
+      winlog.channel: Microsoft-Windows-WinRM/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: winrm
+
+  ################################
+  # CONTEXT-AWARE VARIABLE FIELD MAPPINGS
+  # Different mappings based on category/service
+  ################################
+
+  # Process Creation category mappings
+  - id: ecs_windows_process_creation
+    type: field_name_mapping
+    mapping:
+      FileVersion: process.pe.file_version
+      Description: process.pe.description
+      Product: process.pe.product
+      Company: process.pe.company
+      OriginalFileName: process.pe.original_file_name
+      CommandLine: process.command_line
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation
+
+  # Image Load category mappings
+  - id: ecs_windows_image_load
+    type: field_name_mapping
+    mapping:
+      FileVersion: file.pe.file_version
+      Description: file.pe.description
+      Product: file.pe.product
+      Company: file.pe.company
+      OriginalFileName: file.pe.original_file_name
+      Signature: file.code_signature.subject_name
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: image_load
+
+  # Network Connection category mappings
+  - id: ecs_windows_network_connection
+    type: field_name_mapping
+    mapping:
+      Protocol: network.transport
+      Initiated: network.direction
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: network_connection
+
+  # Driver Load category mappings
+  - id: ecs_windows_driver_load
+    type: field_name_mapping
+    mapping:
+      Signature: file.code_signature.subject_name
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: driver_load
+
+  # Sysmon Error category mappings
+  - id: ecs_windows_sysmon_error
+    type: field_name_mapping
+    mapping:
+      Description: winlog.event_data.Description
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: sysmon_error
+
+  # Security service field mappings
+  - id: ecs_windows_security
+    type: field_name_mapping
+    mapping:
+      CommandLine: process.command_line
+      SubjectLogonId: winlog.logon.id
+      ServiceName: service.name
+      SubjectDomainName: user.domain
+      SubjectUserName: user.name
+      SubjectUserSid: user.id
+      TargetLogonId: winlog.logon.id
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security
+
+  # PowerShell Classic service mappings
+  - id: ecs_windows_powershell_classic
+    type: field_name_mapping
+    mapping:
+      CommandLine: powershell.command.value
+      EngineVersion: powershell.engine.version
+      HostVersion: powershell.process.executable_version
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: powershell-classic
+
+  ################################
+  # GENERAL FIELD MAPPINGS
+  # Common field name translations for all Windows events
+  ################################
+
+  - id: ecs_windows_field_mapping
+    type: field_name_mapping
+    mapping:
+      EventID: event.code
+      Channel: winlog.channel
+      Provider_Name: winlog.provider_name
+      ComputerName: winlog.computer_name
+      FileName: file.path
+      ProcessGuid: process.entity_id
+      ProcessId: process.pid
+      Image: process.executable
+      CurrentDirectory: process.working_directory
+      ParentProcessGuid: process.parent.entity_id
+      ParentProcessId: process.parent.pid
+      ParentImage: process.parent.executable
+      ParentCommandLine: process.parent.command_line
+      TargetFilename: file.path
+      SourceIp: source.ip
+      SourceHostname: source.domain
+      SourcePort: source.port
+      DestinationIp: destination.ip
+      DestinationHostname: destination.domain
+      DestinationPort: destination.port
+      DestinationPortName: network.protocol
+      ImageLoaded: file.path
+      Signed: file.code_signature.signed
+      SignatureStatus: file.code_signature.status
+      Imphash: file.pe.imphash
+      SourceProcessGuid: process.entity_id
+      SourceProcessId: process.pid
+      SourceImage: process.executable
+      Device: file.path
+      SourceThreadId: process.thread.id
+      TargetObject: registry.path
+      PipeName: file.name
+      Destination: process.executable
+      QueryName: dns.question.name
+      QueryStatus: sysmon.dns.status
+      IsExecutable: sysmon.file.is_executable
+      Archived: sysmon.file.archived
+      CommandName: powershell.command.name
+      CommandPath: powershell.command.path
+      CommandType: powershell.command.type
+      HostApplication: process.command_line
+      HostId: process.entity_id
+      HostName: process.title
+      NewEngineState: powershell.engine.new_state
+      PipelineId: powershell.pipeline_id
+      PreviousEngineState: powershell.engine.previous_state
+      RunspaceId: powershell.runspace_id
+      ScriptName: file.path
+      SequenceNumber: event.sequence
+      NewProviderState: powershell.provider.new_state
+      ProviderName: powershell.provider.name
+      MessageNumber: powershell.sequence
+      MessageTotal: powershell.total
+      ScriptBlockText: powershell.file.script_block_text
+      ScriptBlockId: powershell.file.script_block_id
+      AccountDomain: user.domain
+      AccountName: user.name
+      Application: process.executable
+      ClientAddress: source.ip
+      ClientName: source.domain
+      DestAddress: destination.ip
+      DestPort: destination.port
+      IpAddress: source.ip
+      IpPort: source.port
+      NewProcessId: process.pid
+      NewProcessName: process.executable
+      ParentProcessName: process.parent.name
+      ProcessName: process.executable
+      SourceAddress: source.ip
+      TargetDomainName: user.domain
+      User: user.name
+      WorkstationName: source.domain
+      Payload: powershell.file.script_block_text
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  ################################
+  # AUTOMATIC PREFIX FOR UNMAPPED FIELDS
+  # Add winlog.event_data prefix to fields not yet processed
+  ################################
+
+  # Add winlog.event_data. prefix to any field that wasn't mapped by previous transformations
+  # This ensures unmapped Windows fields end up in the event_data structure
+  - id: ecs_windows_eventdata_prefix
+    type: field_name_prefix
+    prefix: "winlog.event_data."
+    field_name_cond_not: true          # Apply to fields NOT matching the conditions below
+    field_name_cond_op: any            # Use OR logic for multiple conditions
+    field_name_conditions:
+      # Don't add prefix if field was already processed by context-aware mappings
+      - type: processing_item_applied
+        processing_item_id: ecs_windows_process_creation
+      - type: processing_item_applied
+        processing_item_id: ecs_windows_image_load
+      - type: processing_item_applied
+        processing_item_id: ecs_windows_network_connection
+      - type: processing_item_applied
+        processing_item_id: ecs_windows_driver_load
+      - type: processing_item_applied
+        processing_item_id: ecs_windows_sysmon_error
+      - type: processing_item_applied
+        processing_item_id: ecs_windows_security
+      - type: processing_item_applied
+        processing_item_id: ecs_windows_powershell_classic
+      # Don't add prefix if field was processed by general field mapping
+      - type: processing_item_applied
+        processing_item_id: ecs_windows_field_mapping
+      # Don't add prefix if field already contains a dot (already namespaced)
+      - type: include_fields
+        fields:
+          - "\\w+\\..*"         # Matches fields like process.pid, winlog.channel, etc.
+        mode: re                # Use regex mode
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  ################################
+  # VALUE TRANSFORMATIONS
+  # Convert specific field values
+  ################################
+
+  # Network direction: true → egress
+  - id: ecs_network_direction_egress
+    type: replace_string
+    regex: "^[Tt]rue$"
+    replacement: "egress"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: network_connection
+
+  # Network direction: false → ingress  
+  - id: ecs_network_direction_ingress
+    type: replace_string
+    regex: "^[Ff]alse$"
+    replacement: "ingress"
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: network_connection

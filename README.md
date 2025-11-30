@@ -16,7 +16,7 @@
 <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/SigmaHQ/pySigma-community-pipelines">
 </p>
 
-Welcome to the pySigma Community Pipelines repository - the central hub for community shared processing pipelines.
+Welcome to the pySigma Community Pipelines repository, the central hub for community-shared processing pipelines.
 
 ## What are Processing Pipelines?
 

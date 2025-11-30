@@ -13,7 +13,6 @@
 
 <p align="center">
 <a href="https://sigmahq.io/"><img src="https://cdn.jsdelivr.net/gh/SigmaHQ/sigmahq.github.io@master/images/Sigma%20Official%20Badge.svg" alt="Sigma Official Badge"></a>
-<img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/SigmaHQ/pySigma-community-pipelines">
 </p>
 
 Welcome to the pySigma Community Pipelines repository, the central hub for community-shared processing pipelines.

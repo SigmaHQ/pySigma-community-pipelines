@@ -156,7 +156,7 @@ postprocessing:
         - {{ ref }}
       {%- endfor %}
       {%- endif %}
-      {% if detection_type in ["Anomaly", "TTP" %}
+      {%- if detection_type in ["Anomaly", "TTP" %}
       rba:
         message:
         risk_objects: []
